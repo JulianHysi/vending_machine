@@ -13,7 +13,7 @@ from core.serializers import (
     ProductSerializer,
     DepositSerializer,
     BuyProductSerializer,
-    EmptySerializer
+    EmptySerializer,
 )
 from core.utils import get_change_in_fewest_coins
 
@@ -25,17 +25,17 @@ class UserViewSet(ModelViewSet):
 
     def get_serializer_class(self):
         match self.action:
-            case 'deposit':
+            case "deposit":
                 return DepositSerializer
-            case 'buy':
+            case "buy":
                 return BuyProductSerializer
-            case 'reset':
+            case "reset":
                 return EmptySerializer
             case _:
                 return UserSerializer  # for the user crud
 
     def get_permissions(self):
-        if self.action == 'create':
+        if self.action == "create":
             return [AllowAny()]  # no auth; anyone can sign up
         return super().get_permissions()
 
@@ -46,17 +46,17 @@ class UserViewSet(ModelViewSet):
 
         if user.role != "buyer":
             return Response(
-                {'detail': 'Only buyers can deposit.'},
-                status=status.HTTP_400_BAD_REQUEST
+                {"detail": "Only buyers can deposit."},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         if serializer.is_valid():
-            amount = serializer.validated_data['amount']
+            amount = serializer.validated_data["amount"]
             user.deposit += amount
             user.save()
             return Response(
-                {'status': 'deposit added', 'new deposit': user.deposit},
-                status=status.HTTP_200_OK
+                {"status": "deposit added", "new deposit": user.deposit},
+                status=status.HTTP_200_OK,
             )
         else:
             return Response(
@@ -70,25 +70,25 @@ class UserViewSet(ModelViewSet):
 
         if user.role != "buyer":
             return Response(
-                {'detail': 'Only buyers can buy.'},
-                status=status.HTTP_400_BAD_REQUEST
+                {"detail": "Only buyers can buy."},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         if serializer.is_valid():
-            product = serializer.validated_data['product']
-            amount = serializer.validated_data['amount']
+            product = serializer.validated_data["product"]
+            amount = serializer.validated_data["amount"]
             purchase_total = product.cost * amount
             change = user.deposit - purchase_total
             if change < 0:
                 return Response(
-                    {'detail': 'Not enough money.'},
-                    status=status.HTTP_400_BAD_REQUEST
+                    {"detail": "Not enough money."},
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
 
             if product.amount_available < amount:
                 return Response(
-                    {'detail': 'Product out of stock.'},
-                    status=status.HTTP_400_BAD_REQUEST
+                    {"detail": "Product out of stock."},
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
 
             with transaction.atomic():
@@ -99,11 +99,11 @@ class UserViewSet(ModelViewSet):
 
             return Response(
                 {
-                    'purchase_total': purchase_total,
-                    'product': product.product_name,
-                    'change': get_change_in_fewest_coins(change),
+                    "purchase_total": purchase_total,
+                    "product": product.product_name,
+                    "change": get_change_in_fewest_coins(change),
                 },
-                status=status.HTTP_200_OK
+                status=status.HTTP_200_OK,
             )
         else:
             return Response(

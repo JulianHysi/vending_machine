@@ -6,8 +6,8 @@ from core.models import User, Product
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'password', 'role']
-        extra_kwargs = {'password': {'write_only': True}}
+        fields = ["id", "username", "password", "role"]
+        extra_kwargs = {"password": {"write_only": True}}
 
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
@@ -17,7 +17,7 @@ class UserSerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ['id', 'amount_available', 'cost', 'product_name']
+        fields = ["id", "amount_available", "cost", "product_name"]
 
 
 class DepositSerializer(serializers.Serializer):
@@ -25,10 +25,11 @@ class DepositSerializer(serializers.Serializer):
 
 
 class BuyProductSerializer(serializers.Serializer):
-    product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
+    product = serializers.PrimaryKeyRelatedField(
+        queryset=Product.objects.all()
+    )
     amount = serializers.IntegerField(validators=[MinValueValidator(1)])
 
 
 class EmptySerializer(serializers.Serializer):
     pass
-

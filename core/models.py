@@ -5,13 +5,15 @@ from django.contrib.auth.models import AbstractUser
 from core.validators import validate_cost
 
 ROLE_CHOICES = [
-    ('buyer', 'Buyer'),
-    ('seller', 'Seller'),
+    ("buyer", "Buyer"),
+    ("seller", "Seller"),
 ]
 
 
 class User(AbstractUser):
-    role = models.CharField(max_length=6, choices=ROLE_CHOICES, default='buyer')
+    role = models.CharField(
+        max_length=6, choices=ROLE_CHOICES, default="buyer"
+    )
     deposit = models.IntegerField(default=0)
 
 
