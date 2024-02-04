@@ -5,7 +5,7 @@ from core.models import User, Product
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'password', 'role', 'deposit']
+        fields = ['id', 'username', 'password', 'role']
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
@@ -17,3 +17,7 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['id', 'amount_available', 'cost', 'product_name']
+
+
+class DepositSerializer(serializers.Serializer):
+    amount = serializers.ChoiceField(choices=[5, 10, 20, 50, 100])
