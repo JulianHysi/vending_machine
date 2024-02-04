@@ -1,3 +1,4 @@
+from django.core.validators import MinValueValidator
 from rest_framework import serializers
 from core.models import User, Product
 
@@ -21,3 +22,8 @@ class ProductSerializer(serializers.ModelSerializer):
 
 class DepositSerializer(serializers.Serializer):
     amount = serializers.ChoiceField(choices=[5, 10, 20, 50, 100])
+
+
+class BuyProductSerializer(serializers.Serializer):
+    product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
+    amount = serializers.IntegerField(validators=[MinValueValidator(1)])
