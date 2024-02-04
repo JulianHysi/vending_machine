@@ -27,3 +27,8 @@ class DepositSerializer(serializers.Serializer):
 class BuyProductSerializer(serializers.Serializer):
     product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
     amount = serializers.IntegerField(validators=[MinValueValidator(1)])
+
+
+class EmptySerializer(serializers.Serializer):
+    pass
+

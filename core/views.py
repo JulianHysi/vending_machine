@@ -8,7 +8,13 @@ from rest_framework import status
 
 from core.models import Product
 from core.permissions import IsSellerOrReadOnly
-from core.serializers import UserSerializer, ProductSerializer, DepositSerializer, BuyProductSerializer
+from core.serializers import (
+    UserSerializer,
+    ProductSerializer,
+    DepositSerializer,
+    BuyProductSerializer,
+    EmptySerializer
+)
 from core.utils import get_change_in_fewest_coins
 
 User = get_user_model()
@@ -24,7 +30,7 @@ class UserViewSet(ModelViewSet):
             case 'buy':
                 return BuyProductSerializer
             case 'reset':
-                return None
+                return EmptySerializer
             case _:
                 return UserSerializer  # for the user crud
 
@@ -53,7 +59,9 @@ class UserViewSet(ModelViewSet):
                 status=status.HTTP_200_OK
             )
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                serializer.errors, status=status.HTTP_400_BAD_REQUEST
+            )
 
     @action(methods=["POST"], detail=False)
     def buy(self, request):
@@ -77,6 +85,12 @@ class UserViewSet(ModelViewSet):
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
+            if product.amount_available < amount:
+                return Response(
+                    {'detail': 'Product out of stock.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
             with transaction.atomic():
                 user.deposit -= purchase_total
                 user.save()
@@ -92,7 +106,9 @@ class UserViewSet(ModelViewSet):
                 status=status.HTTP_200_OK
             )
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                serializer.errors, status=status.HTTP_400_BAD_REQUEST
+            )
 
     @action(methods=["POST"], detail=False)
     def reset(self, request):
