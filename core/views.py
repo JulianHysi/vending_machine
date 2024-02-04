@@ -18,11 +18,15 @@ class UserViewSet(ModelViewSet):
     queryset = User.objects.all()
 
     def get_serializer_class(self):
-        if self.action == 'deposit':
-            return DepositSerializer
-        elif self.action == 'buy':
-            return BuyProductSerializer
-        return UserSerializer
+        match self.action:
+            case 'deposit':
+                return DepositSerializer
+            case 'buy':
+                return BuyProductSerializer
+            case 'reset':
+                return None
+            case _:
+                return UserSerializer  # for the user crud
 
     def get_permissions(self):
         if self.action == 'create':
@@ -89,6 +93,12 @@ class UserViewSet(ModelViewSet):
             )
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=["POST"], detail=False)
+    def reset(self, request):
+        request.user.deposit = 0
+        request.user.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ProductViewSet(ModelViewSet):
